@@ -9,9 +9,9 @@ The purpose of this software is to extract participants data from Moodle and sav
 1. Clone this repository by `git clone https://github.com/nickolasrm/moodle-student-data-scraper`
 2. Open the file data.cfg in a text editor of your preference
 3. Put required data
-   * Username: `username = your_moodle_username`
-   * Password: `password = your_moodle_password`
-   * Course: `My Course Name`
-   * URL: `url = http://your_moodle.com`
+   * Username: `username = "your_moodle_username"`
+   * Password: `password = "your_moodle_password"`
+   * Course: `course = "My Course Name"`
+   * URL: `url = "http://your_moodle.com"`
 4. Save it
 5. In the main folder run the following command `scrapy crawl moodle`
