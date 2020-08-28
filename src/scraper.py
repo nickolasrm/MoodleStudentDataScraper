@@ -19,7 +19,9 @@ def getReportURL(url):
     return newLink
 
 def getDriver(driver):
-    driver = webdriver.Chrome(driver)
+    op = webdriver.ChromeOptions()
+    op.add_argument('headless')
+    driver = webdriver.Chrome(driver, options=op)
     driver.implicitly_wait(10)
     return driver
 
@@ -49,7 +51,7 @@ def enableDaysTable(driver):
         el.setAttribute('aria-expanded', 'true');
         """)
 
-def crawlDaysHeader(driver, link):
+def scrapeDaysHeader(driver, link):
     driver.get(getAllAccessURL(link))
     enableDaysTable(driver)
     headers = [header.get_attribute('innerText') for header 
@@ -57,7 +59,7 @@ def crawlDaysHeader(driver, link):
     headers.pop(0)
     return headers
 
-def crawlDaysData(driver, link):
+def scrapeDaysData(driver, link):
     driver.get(getAllAccessURL(link))
     enableDaysTable(driver)
     data = [value.get_attribute('innerText') for value
@@ -65,14 +67,14 @@ def crawlDaysData(driver, link):
     data.pop(0)
     return data
 
-def crawlGradesHeader(driver, participant_link):
+def scrapeGradesHeader(driver, participant_link):
     driver.get(getReportURL(participant_link))
     headers = [grade.get_attribute('innerText') for grade 
         in driver.find_elements_by_class_name('gradeitemheader')]
     headers.pop(-1)
     return headers
 
-def crawlGradesData(driver, participant_link):
+def scrapeGradesData(driver, participant_link):
     driver.get(getReportURL(participant_link))
     grades = [grade.get_attribute('innerText') for grade 
         in driver.find_elements_by_class_name('column-grade')]
@@ -80,27 +82,38 @@ def crawlGradesData(driver, participant_link):
     grades.pop(0)
     return grades
 
-def crawlParticipantData(driver, participant_link):
-    return {'days': crawlDaysData(driver, participant_link),
-            'grades': crawlGradesData(driver, participant_link)}
+def scrapeStudentName(driver, link):
+    driver.get(link)
+    return driver.find_element_by_tag_name('h2').get_attribute('innerText')
 
-def crawl(config):
+def scrapeParticipantData(driver, participant_link):
+    return {'name': scrapeStudentName(driver, participant_link),
+            'days': scrapeDaysData(driver, participant_link),
+            'grades': scrapeGradesData(driver, participant_link)}
+
+def scrape(config):
+    print('Loggin in...')
+
     driver = getDriver(config['chromedriver'])
     assert login(driver, config['url'], config['username'] \
         , config['password']), 'Wrong username or password'
+
+    print('Logged!')
+
     participants = getParticipantsLinkList(driver, config['course'],
         config['filter'])
     data = []
-    #for link in participants:
-    #    data.append(crawlParticipantData(driver, link))
-    data.append(crawlParticipantData(driver, participants[0]))
-    data.append(crawlParticipantData(driver, participants[1]))
 
-    headers = {'days': crawlDaysHeader(driver, participants[0]),
-                'grades': crawlGradesHeader(driver, participants[0])}
+    print('Scraping...')
 
-    print(headers)
-    print(data)
+    for link in participants:
+        data.append(scrapeParticipantData(driver, link))
+
+    headers = {'name' : 'Name',
+                'days': scrapeDaysHeader(driver, participants[0]),
+                'grades': scrapeGradesHeader(driver, participants[0])}
+
+    print('Scraping finished!')
 
     return {'headers': headers, 'data':data}
         
