@@ -16,8 +16,8 @@ _**Note 2:** This application may not work in all moodles. In reason of that, yo
 * Chrome
 * Chrome driver for your chrome version
    * You can download chrome driver here: https://sites.google.com/a/chromium.org/chromedriver/downloads 
-   * You can check your chrome version by typing the url `chrome://version`
-   * Put it inside project main directory
+   * You can check your chrome version by typing the url: `chrome://version`
+   * Put it inside project's main directory
 
 **How to use it**
 1. Clone this repository by `git clone https://github.com/nickolasrm/moodle-student-data-scraper`
