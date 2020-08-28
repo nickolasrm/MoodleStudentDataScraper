@@ -23,11 +23,12 @@ _**Note 2:** This application may not work in all moodles. In reason of that, yo
 1. Clone this repository by `git clone https://github.com/nickolasrm/moodle-student-data-scraper`
 2. Open the file data.cfg on a text editor of your preference
 3. Put required data
-   * Username: `username = "your_moodle_username"`
-   * Password: `password = "your_moodle_password"`
-   * Course: `course = "My Course Name"`
-   * URL: `url = "http://your_moodle.com"`
-   * driver: `driver = chromedriver_file`
+   * Username: `username = your_moodle_username`
+   * Password: `password = your_moodle_password`
+   * Course: `course = My Course Name`
+   * URL: `url = http://your_moodle.com`
+   * chdromedriver: `driver = ./chromedriver_file`
+   * Filter: `participantsFilter = roles_combobox_option_text`
 4. Save it
 5. In the main folder run the following command `python3 start.py`
 6. The scraped data is saved on a file named `__outputStudentData.csv`, you can open it on any Sheet reader app you want (e.g., LibreOffice Calc).

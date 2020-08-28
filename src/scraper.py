@@ -2,11 +2,12 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 import urllib
-import asyncio
-import time
 
 def getMoodleLoginURL(url):
     return urllib.parse.urljoin(url, '/moodle/login/index.php')
+
+def getMoodleMyURL(url):
+    return urllib.parse.urljoin(url, '/moodle/my')
 
 def getAllAccessURL(url):
     return url.replace('user/view.php', 'report/log/user.php') + '&mode=all'
@@ -32,7 +33,8 @@ def login(driver, url, user, password):
     driver.find_element_by_id('loginbtn').click()
     return True
 
-def getParticipantsLinkList(driver, course, filter):
+def getParticipantsLinkList(driver, url, course, filter):
+    driver.get(getMoodleMyURL(url))
     driver.find_element_by_link_text(course).click()
     driver.find_element_by_xpath("//aside[@data-block='participants']//a").click()
     selector = Select(driver.find_element_by_xpath("//form[@id='rolesform']/select"))
@@ -100,8 +102,8 @@ def scrape(config):
 
     print('Logged!')
 
-    participants = getParticipantsLinkList(driver, config['course'],
-        config['filter'])
+    participants = getParticipantsLinkList(driver, config['url'], 
+        config['course'], config['filter'])
     data = []
 
     print('Scraping...')
