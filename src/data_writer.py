@@ -7,12 +7,8 @@ def saveData(data):
         writer = csv.writer(csv_file, delimiter=',', 
             quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-        header = data['headers']['days'] + data['headers']['grades']
-        header.insert(0, data['headers']['name'])
-        writer.writerow(header)
-        for i in range(0, len(data['data'])):
-            row = data['data'][i]['days'] + data['data'][i]['grades']
-            row.insert(0, data['data'][i]['name'])
+        writer.writerow(data['headers'])
+        for row in data['data']:
             writer.writerow(row)
 
     print('Saved!')

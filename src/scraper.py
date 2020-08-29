@@ -19,6 +19,11 @@ def getReportURL(url):
         'grade/report/user/index.php?id=%s&userid=%s' % (courseId, studentId)
     return newLink
 
+
+
+
+
+
 def getDriver(driver):
     op = webdriver.ChromeOptions()
     op.add_argument('headless')
@@ -46,20 +51,17 @@ def getParticipantsLinkList(driver, url, course, filter):
 
     return participants
 
+
+
+
+
+
 def enableDaysTable(driver):
     driver.execute_script("""
         let el = document.getElementsByClassName('chart-table-data')[0];
         el.style.display = 'block';
         el.setAttribute('aria-expanded', 'true');
         """)
-
-def scrapeDaysHeader(driver, link):
-    driver.get(getAllAccessURL(link))
-    enableDaysTable(driver)
-    headers = [header.get_attribute('innerText') for header 
-        in driver.find_elements_by_xpath("//div[@class='chart-table-data']/table/tr/th")]
-    headers.pop(0)
-    return headers
 
 def scrapeDaysData(driver, link):
     driver.get(getAllAccessURL(link))
@@ -69,14 +71,7 @@ def scrapeDaysData(driver, link):
     data.pop(0)
     return data
 
-def scrapeGradesHeader(driver, participant_link):
-    driver.get(getReportURL(participant_link))
-    headers = [grade.get_attribute('innerText') for grade 
-        in driver.find_elements_by_class_name('gradeitemheader')]
-    headers.pop(-1)
-    return headers
-
-def scrapeGradesData(driver, participant_link):
+def scrapeAssignmentsData(driver, participant_link):
     driver.get(getReportURL(participant_link))
     grades = [grade.get_attribute('innerText') for grade 
         in driver.find_elements_by_class_name('column-grade')]
@@ -88,10 +83,67 @@ def scrapeStudentName(driver, link):
     driver.get(link)
     return driver.find_element_by_tag_name('h2').get_attribute('innerText')
 
-def scrapeParticipantData(driver, participant_link):
-    return {'name': scrapeStudentName(driver, participant_link),
-            'days': scrapeDaysData(driver, participant_link),
-            'grades': scrapeGradesData(driver, participant_link)}
+def scrapeStudentEmail(driver, link):
+    driver.get(link)
+    return driver.find_element_by_xpath(
+        "//dd//a[contains(@href, 'mailto')]").get_attribute('innerText')
+
+def scrapeParticipantData(driver, participant_link, targets):
+    data = []
+    if targets['name']:
+        data.append(scrapeStudentName(driver, participant_link))
+    if targets['email']:
+        data.append(scrapeStudentEmail(driver, participant_link))
+    if targets['days']:
+        data.extend(scrapeDaysData(driver, participant_link))
+    if targets['assignments']:
+        data.extend(scrapeAssignmentsData(driver, participant_link))
+    #if targets['assignments_finishing_date']:
+        #data.extend(scrapeAssignmentsFinishingDateData(driver, participant_link))
+
+    return data
+
+
+
+
+
+
+def scrapeDaysHeader(driver, link):
+    driver.get(getAllAccessURL(link))
+    enableDaysTable(driver)
+    headers = [header.get_attribute('innerText') for header 
+        in driver.find_elements_by_xpath("//div[@class='chart-table-data']/table/tr/th")]
+    headers.pop(0)
+    return headers
+
+def scrapeAssignmentsHeader(driver, participant_link):
+    driver.get(getReportURL(participant_link))
+    headers = [grade.get_attribute('innerText') for grade 
+        in driver.find_elements_by_class_name('gradeitemheader')]
+    headers.pop(-1)
+    return headers
+
+def scrapeHeaders(driver, participant_link, targets):
+    headers = []
+    if targets['name']:
+        headers.append('Name')
+    if targets['email']:
+        headers.append('Email')
+    if targets['days']:
+        headers.extend(scrapeDaysHeader(driver, participant_link))
+    if targets['assignments']:
+        headers.extend(['Grade of "%s"' % header for header 
+            in scrapeAssignmentsHeader(driver, participant_link)])
+    if targets['assignments_finishing_date']:
+        headers.extend(['Finishing date of "%s"' % header for header 
+            in scrapeAssignmentsHeader(driver, participant_link)])
+
+    return headers
+
+
+
+
+
 
 def scrape(config):
     print('Loggin in...')
@@ -101,22 +153,21 @@ def scrape(config):
         , config['password']), 'Wrong username or password'
 
     print('Logged!')
+    print('Scraping...')
 
     participants = getParticipantsLinkList(driver, config['url'], 
         config['course'], config['filter'])
+
     data = []
+    #for link in participants:
+    #    data.append(scrapeParticipantData(driver, link, config['targets']))
+    data.append(scrapeParticipantData(driver, participants[0], config['targets']))
+    data.append(scrapeParticipantData(driver, participants[1], config['targets']))
 
-    print('Scraping...')
-
-    for link in participants:
-        data.append(scrapeParticipantData(driver, link))
-
-    headers = {'name' : 'Name',
-                'days': scrapeDaysHeader(driver, participants[0]),
-                'grades': scrapeGradesHeader(driver, participants[0])}
+    headers = scrapeHeaders(driver, participants[0], config['targets'])
 
     print('Scraping finished!')
 
-    return {'headers': headers, 'data':data}
+    return {'headers': headers, 'data': data}
         
     
