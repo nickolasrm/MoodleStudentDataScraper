@@ -6,8 +6,10 @@ _**Note 2:** This application may not work in all moodles. In reason of that, yo
 
 **Scraped Data**
 1. Participants names
-2. Participants access frequency per day
-3. Participants grades
+2. Participants emails
+3. Participants access frequency per day
+4. Participants assignments grades
+5. Participants assignments finishing dates
 
 **What you need**
 * Python3
@@ -29,6 +31,7 @@ _**Note 2:** This application may not work in all moodles. In reason of that, yo
    * URL: `url = http://your_moodle.com`
    * chdromedriver: `driver = ./chromedriver_file`
    * Filter: `participantsFilter = roles_combobox_option_text`
-4. Save it
-5. In the main folder run the following command `python3 start.py`
-6. The scraped data is saved on a file named `__outputStudentData.csv`, you can open it on any Sheet reader app you want (e.g., LibreOffice Calc).
+4. (Optional) Select data you want to extract by putting `yes` or `no` on the options under targets section in `data.cfg` file.
+5. Save it
+6. In the main folder run the following command `python3 start.py`
+7. The scraped data is saved on a file named `__outputStudentData.csv`, you can open it on any Sheet reader app you want (e.g., LibreOffice Calc).

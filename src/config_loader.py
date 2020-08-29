@@ -4,7 +4,7 @@ def loadConfig():
     print('Loading config...')
 
     config = configparser.ConfigParser()
-    config.read('data-test.cfg')
+    config.read('data.cfg')
     cfg = {
         'username': config['login']['username'],
         'password': config['login']['password'],
