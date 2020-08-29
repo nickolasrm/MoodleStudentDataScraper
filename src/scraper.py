@@ -175,7 +175,7 @@ def scrapeHeaders(driver, participant_link, targets):
 
 
 def scrape(config):
-    print('Loggin in...')
+    print('Logging in...')
 
     driver = getDriver(config['chromedriver'])
     assert login(driver, config['url'], config['username'] \
