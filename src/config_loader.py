@@ -1,10 +1,11 @@
 import configparser
+import os
 
 def loadConfig():
     print('Loading config...')
 
     config = configparser.ConfigParser()
-    config.read('data.cfg')
+    config.read(os.path.join(os.getcwd(), 'data.cfg'), encoding='utf-8')
     cfg = {
         'username': config['login']['username'],
         'password': config['login']['password'],

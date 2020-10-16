@@ -1,8 +1,9 @@
 # Moodle Student Data Scraper
 The purpose of this software is to extract participants data from Moodle and save it on a table file.
 
-_**Note:** Only tested in Moodle 3.7 using Boost Theme_
-_**Note 2:** This application may not work in all Moodles. In reason of that, you are free to modify it to attend your purposes_
+_**Note:** Only tested in Moodle 3.7 using Boost Theme_  
+_**Note 2:** This application may not work in all Moodles. In reason of that, you are free to modify it to attend your purposes_  
+_**Note 3:** Scraper is configured to read 'data.cfg' as a file using UTF-8 table._
 
 **Scraped Data**
 1. Participants name

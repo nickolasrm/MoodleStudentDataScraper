@@ -3,6 +3,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import Select
 import urllib
 import sys
+import re
 
 def getMoodleLoginURL(url):
     return urllib.parse.urljoin(url, '/moodle/login/index.php')
@@ -30,7 +31,7 @@ def getOutlineURL(url):
 
 def getDriver(driver):
     op = webdriver.ChromeOptions()
-    op.add_argument('headless')
+    #op.add_argument('headless')
     driver = webdriver.Chrome(driver, options=op)
     driver.implicitly_wait(10)
     return driver
@@ -42,18 +43,31 @@ def login(driver, url, user, password):
     driver.find_element_by_id('loginbtn').click()
     return True
 
+def getColumnClass(driver):
+    el = driver.find_element_by_xpath("//a[contains(@href,\
+        'firstname')]/parent::th")
+    classes = el.get_attribute('class')
+    return re.search(r'c\d+', classes).group()
+
+
 def getParticipantsLinkList(driver, url, course, filter):
     driver.get(getMoodleMyURL(url))
     driver.find_element_by_link_text(course).click()
     driver.find_element_by_xpath("//aside[@data-block='participants']//a").click()
     selector = Select(driver.find_element_by_xpath("//form[@id='rolesform']/select"))
     selector.select_by_visible_text(filter)
-    driver.find_element_by_xpath("//div[@id='showall']//a").click()
+    
+    showAll = driver.find_elements_by_xpath("//div[@id='showall']//a")
+    if len(showAll) > 0:
+    	showAll[0].click()
+    else:
+        print('\nNo \"show all\" button. Skipping...\nScraping', end='', flush=True)
 
-    participants = [link.get_attribute('href') for link 
-        in driver.find_elements_by_xpath("//tr/td[@class='cell c2']//a")]
+    col = getColumnClass(driver)
+    parts = driver.find_elements_by_xpath("//tr/td[@class='cell %s']//a" % col)
+    links = [link.get_attribute('href') for link in parts]
 
-    return participants
+    return links
 
 
 
