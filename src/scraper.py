@@ -31,7 +31,7 @@ def getOutlineURL(url):
 
 def getDriver(driver):
     op = webdriver.ChromeOptions()
-    #op.add_argument('headless')
+    op.add_argument('headless')
     driver = webdriver.Chrome(driver, options=op)
     driver.implicitly_wait(10)
     return driver
